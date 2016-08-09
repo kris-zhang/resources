@@ -1,0 +1,23 @@
+@startuml
+
+package mice_search_list {
+    component cache_module
+    interface list_api
+}
+
+component mice_search_updater
+component mice_baseinfo
+component mice_cms
+component mice_fe
+database mice_db
+interface qconfig
+
+mice_baseinfo ..> mice_search_updater : 会议厅变更消息
+cache_module  <.. mice_search_updater: 更新缓存消息
+
+mice_cms -> list_api : use
+mice_cms - mice_db
+mice_cms -> qconfig : use
+mice_fe -> mice_cms : use
+
+@enduml

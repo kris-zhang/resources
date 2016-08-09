@@ -1,0 +1,64 @@
+@startuml
+
+package "其他表"{
+
+    /' mice_tag 相对应 走baseinfo 的dubbo接口 '/
+    class mice_product_tag_mapping {
+        id : 主健id
+        tag_id: mice_tag中的id
+        pid : 外建id
+        联合主健(pid,tag_id)
+    }
+}
+
+package "产品纬度:db:mice_baseinfo" {
+    class mice_product {
+        id : 主健id
+        supplier_id : 供应商id : int11
+        mice_id : mice店铺id : varchar(32)
+        product_name   : 产品名字   :varchar(64)
+        product_type: 产品类型     :tiny_int
+        status  : 产品状态  :tiny_int
+        introduce : 产品简介   :varchar(128)
+        days : 产品天数          : small_int
+        head_count_max : 产品人数 :small_int
+        head_count_min : 产品人数 :small_int
+        qunar_price : 去哪儿价 : decimal(10,2)
+        market_price : 市场价: decimal(10,2)
+    }
+
+    /' 套餐说明信息 '/
+    class mice_product_detail {
+        product_id : 产品id
+        class price_detail 价格列表 : json {name:费用项目,count:数量,market_price:市场单价,summary:小计}
+        class area_detail 场地信息 : json {name:场地名称,address:场地地址,acreage:面积,max_capacity:最大容纳人数,has_pillar:是否有柱,introduce:场地简介 }
+        class traffic_detail : json {has_bus:是否可提供客车,bus_name:客车名称,seat_introduce:座位,insurance_introduce:保险说明,价格说明:price_introduce,remark:备注说明}
+        class food_detail : json {type:用餐类型 introduce:餐饮说明}
+        class room_detail : json {type:房间类型 introduce:住宿说明}
+        class schedule_detail : json {time_from time_to:时间段 introduce:活动内容 images:活动图片}
+        class amusement_detail : json {name:项目名称 introduce:项目简介 }
+        class insurance_detail : json {has_insurance:是否含保险 name:保险名称 introduce:保险介绍}
+        class attr: json {other_discount:其他优惠 attention:行前注意事项 security_note:安全注意事项 booking_note:预订提示}
+    }
+
+    mice_product_detail -> mice_product
+}
+
+package "订单纬度 mice_offer" {
+    class mice_order {
+        supplier_id : 供应商id : int11
+        mice_id : mice店铺id  : varchar(32)
+        product_id : 产品id   : int11
+        contact_mobile: 联系电话    varchar(32)
+        contact_name : 联系人姓名    varchar(32)
+        begin_time : 参会开始时间:  timestamp
+        end_time : 参会结束时间: timestamp
+        user_remark : 用户备注 varchar(128)
+        remark: 运营备注    varchar(512)
+        price_list : 价格请单快照 : text
+        sum_price : 总价 :decimal(10,2)
+        status : 订单状态: tiny_int
+    }
+}
+
+@enduml

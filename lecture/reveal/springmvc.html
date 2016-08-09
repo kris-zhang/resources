@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title></title>
+
+    <meta name="description" content="springMVC 教程">
+    <meta name="author" content="kris.zhang">
+
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/kris-league.css" id="theme">
+
+    <!-- Code syntax highlighting -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+        document.getElementsByTagName('head')[0].appendChild(link);
+    </script>
+
+    <!--[if lt IE 9]>
+    <script src="lib/js/html5shiv.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+<div class="reveal">
+
+    <!-- Any section element inside of this container is displayed as a slide -->
+    <div class="slides">
+        <section>
+            <h1>Spring MVC Framework</h1>
+            <p>
+                <small>powered by kris.zhang</small>
+            </p>
+        </section>
+        <section>
+            <section>
+                <h3>What's springMVC ?</h3>
+                <ol>
+                    <li class="fragment">It's a FRAMEWORK</li>
+                    <li class="fragment">Depends on Spring Framework</li>
+                    <li class="fragment">Helps to handle HTTP requests</li>
+                </ol>
+            </section>
+            <section>
+                <h3>Structure of MVC ?</h3>
+            </section>
+            <section>
+                <img src="image_spring_mvc/1_1.png"/>
+            </section>
+            <section>
+                <img src="image_spring_mvc/1_2.png"/>
+            </section>
+            <section>
+                <img src="image_spring_mvc/1_3.png"/>
+            </section>
+
+            <section>
+                <h3>Philosophy of MVC ?</h3>
+                <ol>
+                    <li class="fragment highlight-green">Model</li>
+                    <li class="fragment highlight-red">View</li>
+                    <li class="fragment highlight-blue">Controller</li>
+                </ol>
+            </section>
+        </section>
+         <section>
+                <h3>Core Interfaces and Classes</h3>
+                <ol>
+                    <li class="fragment">DispatcherServlet</li>
+                    <li class="fragment">HandlerMapping</li>
+                    <li class="fragment">HandlerMethod/Controller/HttpRequestHandler</li>
+                    <li class="fragment">Model</li>
+                    <li class="fragment">ViewResolver</li>
+                    <li class="fragment">View</li>
+                    <li class="fragment">ModelAndView</li>
+  		    <li class="fragment">HandlerInterceptor</li>
+                    <li class="fragment">HandlerExecutionChain</li>
+                    <li class="fragment">HandlerAdapter</li>
+                </ol>
+            </section>
+        <section>
+            <section>
+                <h3>DispatcherServlet</h3>
+            </section>
+            <section>
+                <img src="image_spring_mvc/2_1.png"/>
+            </section>
+            <section>
+                <img src="image_spring_mvc/2_2.png"/>
+            </section>
+            <section>
+                <img src="image_spring_mvc/2_3.png"/>
+            </section>
+            <section>
+                <img src="image_spring_mvc/2_4.png"/>
+            </section>
+            <section>
+                <img src="image_spring_mvc/2_5.png"/>
+            </section>
+        </section>
+
+        <section>
+            <section>
+                <h3>Talk IS CHEAP SHOW ME THE CODE!</h3>
+                <ol>
+                    <li class="fragment">dispatcher-servlet.xml web.xml</li>
+                    <li class="fragment">Three methods to define Handler</li>
+                    <li class="fragment">Map URL to Handlers</li>
+                    <li class="fragment">Http Protocol Mapping Parameters</li>
+                    <li class="fragment">Model and View(Resolver)</li>
+                    <li class="fragment">Object Binding and Validator</li>
+                    <li class="fragment">Interceptor and ExceptionHandler</li>
+                </ol>
+            </section>
+
+            <section>
+                <h3> Purpose of This Lesson</h3>
+                <ol>
+                    <li class="fragment">Core Thinking of MVC</li>
+                    <li class="fragment">Basic configuration</li>
+                    <li class="fragment">Define your own handler</li>
+                    <li class="fragment">Map HTTP Protocol to your methods</li>
+                    <li class="fragment">Build ModelAndView</li>
+                    <li class="fragment">Define your own Interceptor and ExceptionHandler</li>
+                </ol>
+            </section>
+
+            <section>
+                <h3>dispatcher-servlet.xml web.xml</h3>
+                <ol>
+                    <li class="fragment">context:component-scan</li>
+                    <li class="fragment">mvc:annotation-driven</li>
+                    <li class="fragment">mvc:default-servlet-handler</li>
+                    <li class="fragment">ContextLoaderListener</li>
+                    <li class="fragment">DispatcherServlet</li>
+                </ol>
+            </section>
+
+            <section>
+                <h3>Three methods to define Handler</h3>
+                <ol>
+                    <li class="fragment">HttpRequestHandler</li>
+                    <li class="fragment">Controller</li>
+                    <li class="fragment">@Controller</li>
+                </ol>
+            </section>
+
+            <section>
+                <h3>Map URL to Handlers</h3>
+                <ol>
+                    <li class="fragment">@RequestMapping</li>
+                    <li class="fragment">RequestMappingHandlerMapping</li>
+                </ol>
+            </section>
+
+            <section>
+                <h3>Http Protocol Mapping</h3>
+                <ol>
+                    <li class="fragment">Review Http Protocol</li>
+                    <li class="fragment">@CookieValue</li>
+                    <li class="fragment">@RequestBody</li>
+                    <li class="fragment">@RequestHeader</li>
+                    <li class="fragment">@RequestParam</li>
+                    <li class="fragment">@ResponseBody</li>
+                    <li class="fragment">@HttpEntity</li>
+                    <li class="fragment">Others</li>
+                    <li class="fragment">RequestMappingHandlerAdapter</li>
+                    <li class="fragment">HandlerMethod</li>
+                    <li class="fragment">HttpMessageConverter</li>
+                </ol>
+            </section>
+
+            <section>
+                <h3>Model and View(Resolver)</h3>
+                <ol>
+                    <li class="fragment">ViewResolver</li>
+                    <li class="fragment">Model</li>
+                    <li class="fragment">View</li>
+                    <li class="fragment">ModelAndView</li>
+                    <li class="fragment">InternalResourceViewResolver</li>
+                    <li class="fragment">InternalResourceView</li>
+                </ol>
+            </section>
+
+            <section>
+                <h3>Object Binding and Validator</h3>
+                <ol>
+                    <li class="fragment">@Valid</li>
+                    <li class="fragment">BindingResult</li>
+                    <li class="fragment">@InitBinder</li>
+                    <li class="fragment">WebArgumentResolver</li>
+                    <li class="fragment">WebBindingInitializer</li>
+                </ol>
+            </section>
+
+            <section>
+                <h3>Interceptor and ExceptionHandler</h3>
+                <ol>
+                    <li class="fragment">@ExceptionHandler</li>
+                    <li class="fragment">HandlerExceptionResolver</li>
+                    <li class="fragment">HandlerInterceptor</li>
+                    <li class="fragment">mvc:interceptors</li>
+                </ol>
+            </section>
+        </section>
+
+        <section>
+            <h1>Q&A</h1>
+        </section>
+
+    </div>
+
+</div>
+
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.js"></script>
+
+<script>
+
+    // Full list of configuration options available at:
+    // https://github.com/hakimel/reveal.js#configuration
+    Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+        // Optional reveal.js plugins
+        dependencies: [
+            {
+                src: 'lib/js/classList.js', condition: function () {
+                return !document.body.classList;
+            }
+            },
+            {
+                src: 'plugin/markdown/marked.js', condition: function () {
+                return !!document.querySelector('[data-markdown]');
+            }
+            },
+            {
+                src: 'plugin/markdown/markdown.js', condition: function () {
+                return !!document.querySelector('[data-markdown]');
+            }
+            },
+            {
+                src: 'plugin/highlight/highlight.js', async: true, condition: function () {
+                return !!document.querySelector('pre code');
+            }, callback: function () {
+                hljs.initHighlightingOnLoad();
+            }
+            },
+            {src: 'plugin/zoom-js/zoom.js', async: true},
+            {src: 'plugin/notes/notes.js', async: true}
+        ]
+    });
+
+</script>
+
+</body>
+</html>

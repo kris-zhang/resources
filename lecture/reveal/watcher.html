@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title></title>
+
+		<meta name="description" content="watcher分享">
+		<meta name="author" content="kris.zhang">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/sky.css" id="theme">
+
+        <!-- Code syntax highlighting -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+                <section>
+					<h1>watcher分享</h1>
+					<h4>wathcer的基本思想和一般使用</h4>
+					<p>
+						<small>powered by kris.zhang</small>
+					</p>
+				</section>
+				 <section>
+					<h3>讲解的主要内容</h3>
+						<ul>
+								<li class="fragment">watcher是什么东西</li>
+								<li class="fragment">与其他监控的区别是什么</li>
+								<li class="fragment" >如何使用</li>
+						</ul>
+				</section>
+				<section>
+					<section>
+						<h3>什么是watcher?</h3>
+					</section>
+					<section>
+						<p>graphite + grafana + shinken(nagios)</p>			
+					</section>
+					<section>
+						<p>graphite用于存储时间序列数据</p>
+					</section>
+					<section>
+						<p>shinken用来做通知报警</p>
+						<p>不过据opsdev哥们说坑太多，又改回nagios了</p>
+					</section>
+					<section>
+						<p>grafana用来做dashboard</p>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h3>与cerberus有啥区别?</h3>
+					</section>
+					<section>
+						<p>两个监控基本上一样</p>
+						<p>cerberus能做的watcher也能做</p>
+						<p>watcher能做的cerberus也可以做</p>
+					</section>
+					<section>
+						<p>都是基于指标</p>
+						<p>都有tag的概念和各种聚合操作</p>
+						<p>但watcher更加简洁，测试起来更加方便</p>
+					</section>
+					<section>
+						<p>报警配置和指标聚合个人认为watcher要比cerberus灵活</p>
+						<p>怎么灵活了？请听后文</p>
+					</section>
+					<section>
+						<p>个人觉得grafana的dashboard比较上档次</p>
+						<p>并且对于代码来讲是崇洋媚外的</p>
+					</section>
+					<section>
+						<p>cerberus生下来就支持jvm和dubbo监控</p>
+						<p>watcher需要自己想办法</p>
+					</section>
+					<section>
+						<p>cerberus有好用的客户端，但watcher目前还没有</p>
+					</section>
+					<section>
+						<p>因此按照watcher和cerberus的共同作者zhongyuan.zhang的原话</p>
+						<p><strong>cerberus适合做业务监控</strong></p>
+						<p><strong>watcher主要替代cacti做系统级监控</strong></p>
+					</section>
+				</section>
+				<section>
+					<section>
+					    <h3>如何使用？</h3>
+					</section>
+					<section>
+						<p>喂数 -> 看图 -> 设报警</p>
+					</section>
+					<section>
+						<h3>喂数</h3>
+					</section>
+					<section>
+						<p>使用shell</p>
+						<pre><code data-trim contenteditable>
+SERVER=qmon-beta.corp.qunar.com
+PORT=2013
+while true
+do
+	echo "t.kris.test 100 `date \+%s`" | nc ${SERVER} ${PORT}
+	echo 'push data'
+	sleep 5
+done
+</code>
+						</pre>
+					</section>
+					<section>
+						<p>使用python</p>
+						<pre>
+							<code data-trim contenteditable>
+import socket
+import time
+
+SERVER = "qmon-vacation.corp.qunar.com"
+PORT = 2013
+
+def record(tags):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((SERVER, PORT))
+    timestamp = int(time.time())
+    lines = []
+    for line in tags:
+        lines.append(line['tag'] + " %f %d" % (line['count'], timestamp))
+    message = '\n'.join(lines) + '\n'
+    sock.send(message)
+    sock.close()
+							</code>
+						</pre>
+					</section>
+					<section>
+						<p>一个具体的使用例子</p>
+						<pre>
+						<code data-trim contenteditable>
+cur = conn.cursor()
+cur.execute("""
+    select p_function, count(p_function) from b2c_product_summary where id in (
+          select product_id from b2c_order
+          where create_time > now() - '5 minutes'::interval and create_time < now()
+          )
+    group by p_function;
+""")
+
+orders_create = cur.fetchall()
+tags = []
+cur.close()
+conn.close()
+
+for order in orders_create:
+    tags.append({'tag': "s.vacation.tts.order." + order[0] + ".create_5min", 'count': order[1]})
+
+watcher.record(tags)
+time.sleep(5*60)
+						</code>
+						</pre>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h3>看图</h3>
+					</section>
+					<section>
+						<ul>
+								<li class="fragment">可以在自己的空间瞎折腾</li>
+								<li class="fragment">需要了解一些常用函数(averageSeries,derivative,sum,group,max,min)</li>
+								<li class="fragment">让你富有创造力的设置</li>
+								<li class="fragment">自己折腾的结果可以共享出去，也可以设置锁</li>
+						</ul>
+						
+						<p class="fragment">
+						<a href='http://docs.grafana.org/reference/graph/#general'>
+							http://docs.grafana.org/reference/graph/#general
+						</a>
+						</p>
+					</section>
+					<section>
+						<p>直接渲染出图</p>
+						<img src="http://qmon-local.corp.qunar.com/render?target=s.vacation.tts.memcache.mem2.hit_ratio&target=s.vacation.tts.memcache.mem1.hit_ratio&width=800&height=400&format=png&from=-2d"/>
+					</section>
+				</section>
+				<section>
+					<section>
+						<p>设报警</p>
+					</section>
+					<section>
+						<p>举个栗子</p>
+						<a href="http://wiki.corp.qunar.com/pages/viewpage.action?pageId=71946161">
+						http://wiki.corp.qunar.com/pages/viewpage.action?pageId=71946161
+						</a>
+					</section>
+				</section>
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
+

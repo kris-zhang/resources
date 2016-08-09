@@ -1,0 +1,59 @@
+@startuml
+
+participant user
+
+user -> list_http_provider : request
+activate list_http_provider
+
+list_http_provider -> list_http_provider: adapt()
+
+list_http_provider -> list_core : search()
+activate list_core
+
+list_core -> list_engine: searchInEngine()
+activate list_engine
+
+list_engine -> list_engine: dubboSearch()
+list_engine -> list_engine: adapt()
+
+list_engine -> list_core: EngineSearchResults
+deactivate list_engine
+
+list_core -> list_data: retrieve()
+activate list_data
+
+list_data -> list_data:cache.get()
+
+list_data->list_core: data
+deactivate list_data
+
+list_core -> list_filter: filterChain.filter()
+activate list_filter
+
+list_filter -> list_filter: filter()
+
+list_filter -> list_core: data
+deactivate list_filter
+
+list_core -> list_rank: rank()
+activate list_rank
+
+list_rank -> list_rank: dispatch()
+list_rank -> list_rank: rank()
+list_rank -> list_rank: merge()
+
+list_rank -> list_core: rankResults
+deactivate list_rank
+
+list_core -> list_http_provider
+deactivate list_core
+
+list_http_provider -> list_http_provider: convert()
+
+list_http_provider -> user: response
+
+deactivate list_http_provider
+
+
+
+@enduml
