@@ -1,0 +1,183 @@
+@startuml
+skinparam backgroundColor #EEEBDC
+skinparam handwritten true
+
+skinparam sequence {
+	ArrowColor DeepSkyBlue
+	ActorBorderColor DeepSkyBlue
+	LifeLineBorderColor blue
+	LifeLineBackgroundColor #A9DCDF
+
+	ParticipantBorderColor DeepSkyBlue
+	ParticipantBackgroundColor DodgerBlue
+	ParticipantFontName Impact
+	ParticipantFontSize 17
+	ParticipantFontColor #A9DCDF
+
+	ActorBackgroundColor aqua
+	ActorFontColor DeepSkyBlue
+	ActorFontSize 17
+	ActorFontName Aapex
+}
+
+
+/' 查询走缓存
+
+participant "QueryRepliesService" as A
+participant "FeedReplyManager" as B
+participant "FeedReplyRepository" as C
+participant "ReplyService" as D
+participant "GeneralCacheService" as E
+
+
+A -> B : queryReplies
+activate A
+activate B
+
+B -> C: query
+activate C
+
+C -> E: queryFromCache
+activate C
+activate E
+
+E -> C : miss
+deactivate E
+destroy E
+
+C -> D : queryFromDB
+activate D
+
+D -> C
+deactivate D
+
+C -> E : putInCache
+activate E
+
+E -> C
+deactivate E
+
+C -> B : convert
+deactivate C
+
+B -> A
+deactivate B
+'/
+
+/'
+participant "QueryRepliesService" as A
+participant "FeedReplyManager" as B
+participant "FeedReplyRepository" as C
+participant "ReplyService" as D
+participant "DRM" as E
+
+
+A -> B : queryReplies
+activate A
+activate B
+
+B -> C: query
+activate C
+
+C -> E : queryRepliesPageSize
+activate E
+E -> C
+deactivate E
+
+C -> D : queryFromDB
+activate D
+
+D -> C
+deactivate D
+
+C -> B : convert
+deactivate C
+
+B -> A
+deactivate B
+
+'/
+
+/' 新增评论时序图
+
+participant "CommunityPbRpc" as A
+participant "CommunityReplyService" as B
+participant "FeedReplyRepository" as C
+participant "ReplyService" as D
+participant "GeneralCacheService" as E
+participant "DRM" as F
+
+A -> B : execute
+activate A
+activate B
+
+B -> C : rebuildCache
+activate C
+
+C -> F : queryRepliesFirstPageSize
+
+activate F
+
+F -> C
+deactivate F
+
+C -> D : queryFromDB
+activate D
+
+D -> C : DO
+deactivate D
+
+C -> E : putInCache
+activate E
+
+E -> C
+deactivate E
+
+C -> B
+deactivate C
+
+B -> A
+deactivate B
+
+'/
+participant "CommunityPbRpc" as A
+participant "DelReplyService" as B
+participant "FeedReplyRepository" as C
+participant "ReplyService" as D
+participant "GeneralCacheService" as E
+participant "DRM" as F
+
+A -> B : delReply
+activate A
+activate B
+
+B -> C : rebuildCache
+activate C
+
+C -> F : queryRepliesFirstPageSize
+
+activate F
+
+F -> C
+deactivate F
+
+C -> D : queryFromDB
+activate D
+
+D -> C : DO
+deactivate D
+
+C -> E : putInCache
+activate E
+
+E -> C
+deactivate E
+
+C -> B
+deactivate C
+
+B -> A
+deactivate B
+
+@enduml
+
